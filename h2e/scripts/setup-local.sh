@@ -6,7 +6,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."   # -> h2e/
 RPC="http://127.0.0.1:8899"
 DEVNET="$(tr -d '[:space:]' < ../.helius-url)"
-LOG=/tmp/claude-1000/-home-pikoo-Desktop-H2E/6978b2b6-8014-4c44-84a7-f89fb4a25c87/scratchpad/validator.log
+LOG="$(cd .. && pwd)/validator.log"   # repo root; *.log is gitignored
 
 DBC=dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN
 METAPLEX=metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s

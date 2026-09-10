@@ -1,7 +1,8 @@
 import { PublicKey } from '@solana/web3.js'
 import { h, mount, empty, short } from '../ui'
 import { conn } from '../rpc'
-import { loadCoin, loadBuckets, loadTokenMeta } from '../chain'
+import { loadCoin, loadBuckets } from '../chain'
+import { loadCoinMeta } from '../coinmeta'
 import { assetLabel } from '../catalog'
 import { walletPubkey } from '../wallet'
 import { verifyRoundFile, findEntry, RoundFile } from '../verify'
@@ -22,8 +23,8 @@ export async function renderRound(root: HTMLElement, mintStr?: string, epochStr?
   try { mint = new PublicKey(mintStr) } catch { mount(root, empty('Invalid mint.', 'Check the address.')); return }
   const cc = await loadCoin(mint)
   if (!cc) { mount(root, empty('No coin found at this mint.', 'Wrong RPC, or not an H2E coin.')); return }
-  const meta = await loadTokenMeta(mint)
-  const ticker = meta?.symbol ? '$' + meta.symbol : short(mint.toBase58(), 6)
+  const meta = await loadCoinMeta(mint)
+  const ticker = meta.symbol ? '$' + meta.symbol.replace(/^\$/, '') : short(mint.toBase58(), 6)
   const epoch = epochStr != null ? parseInt(epochStr, 10) : Number(cc.current_epoch)
 
   mount(root, h('div', { style: 'margin:1.5rem 0 0' }, [

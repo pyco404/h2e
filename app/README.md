@@ -1,4 +1,4 @@
-# H2E app — launch console (scaffold)
+# H2E app —
 
 A **scaffold**, not a working product. The launch flow is real and works
 end-to-end against a chain that has the program deployed; every other screen is

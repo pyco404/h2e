@@ -11,11 +11,16 @@ import { renderRound } from './pages/round'
 
 const app = () => document.getElementById('app')!
 
+/** Sections that get the console chrome (nav + RPC + wallet). Everything else —
+ *  today just the marketing landing at #/ — gets the plain marketing header:
+ *  logo and one way in. A visitor who has just arrived sees no RPC and no wallet. */
+const APP_SECTIONS = new Set(['coin', 'launch', 'mine', 'round'])
+const section = () => (location.hash || '#/').replace(/^#\//, '').split('/').filter(Boolean)[0] || 'home'
+
 async function route() {
-  const hash = location.hash || '#/'
-  const parts = hash.replace(/^#\//, '').split('/').filter(Boolean)
+  const parts = (location.hash || '#/').replace(/^#\//, '').split('/').filter(Boolean)
   const root = app()
-  setActiveNav(parts[0] || 'home')
+  renderChrome()
   root.replaceChildren(h('p', { class: 'status', style: 'padding:2rem 0' }, ['Loading…']))
   try {
     if (parts.length === 0) await renderHome(root)
@@ -33,38 +38,28 @@ async function route() {
   }
 }
 
-function setActiveNav(section: string) {
-  document.querySelectorAll<HTMLElement>('#nav a').forEach((a) => {
+/** Header for the current route. No drawer and no toggle: on mobile the nav is a
+ *  always-visible second row (see the 720px block in styles.css). */
+function renderChrome() {
+  const sec = section()
+  const isApp = APP_SECTIONS.has(sec)
+
+  const nav = document.getElementById('nav')!
+  nav.hidden = !isApp
+  nav.querySelectorAll<HTMLElement>('a').forEach((a) => {
     const r = a.getAttribute('data-route') || ''
-    a.classList.toggle('on', r === '#/' + section)
-    a.onclick = (e) => { e.preventDefault(); closeMenu(); location.hash = r }
+    a.classList.toggle('on', r === '#/' + sec)
+    a.onclick = (e) => { e.preventDefault(); location.hash = r }
   })
-}
 
-const menuBtn = () => document.getElementById('menu-btn')
-const navEl = () => document.getElementById('nav')
-function closeMenu() { navEl()?.classList.remove('open'); menuBtn()?.setAttribute('aria-expanded', 'false') }
-function setupMenu() {
-  const btn = menuBtn(); const nav = navEl(); if (!btn || !nav) return
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation()
-    const open = nav.classList.toggle('open')
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false')
-  })
-  // close when tapping outside the menu or on Escape
-  document.addEventListener('click', (e) => {
-    if (!nav.classList.contains('open')) return
-    const t = e.target as Node
-    if (!nav.contains(t) && t !== btn) closeMenu()
-  })
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu() })
-}
-
-function renderWalletChip() {
   const slot = document.getElementById('wallet-slot')!
+  if (!isApp) {
+    slot.replaceChildren(h('a', { class: 'applink', href: '#/coin' }, ['Launch app →']))
+    return
+  }
   const pk = walletPubkey()
   const host = (() => { try { return new URL(rpcUrl()).host } catch { return rpcUrl() } })()
-  const rpc = h('span', { class: 'chip', style: 'cursor:default;color:var(--faint)' }, [host])
+  const rpc = h('span', { class: 'chip rpc-chip', title: rpcUrl(), style: 'cursor:default;color:var(--faint)' }, [host])
   const btn = pk
     ? h('button', { class: 'chip', title: 'Disconnect', onClick: () => disconnect() }, [`${pk.toBase58().slice(0, 4)}…${pk.toBase58().slice(-4)}`])
     : h('button', { class: 'chip', onClick: async () => { try { await connect() } catch (e: any) { alert(e?.message || String(e)) } } }, [available() ? 'Connect wallet' : 'No wallet'])
@@ -72,7 +67,6 @@ function renderWalletChip() {
 }
 
 window.addEventListener('hashchange', route)
-window.addEventListener('h2e:wallet', () => { renderWalletChip(); route() })
-setupMenu()
-renderWalletChip()
+window.addEventListener('h2e:wallet', () => { renderChrome(); route() })
+renderChrome()
 loadCatalog().finally(route)

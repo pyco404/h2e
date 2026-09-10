@@ -4,7 +4,6 @@ import {
   pdas, decodeGlobalConfig, decodeCoinConfig, decodePlatformAllowlist,
   allCoinConfigs, epochsForMint, bucketsForEpoch, payoutVaultBalance, platformAllowlistMints,
 } from '../../h2e/client'
-import { deriveMintMetadata } from '@meteora-ag/dynamic-bonding-curve-sdk'
 import { assetLabel as catLabel } from './catalog'
 
 // Read-only chain access. Every decode goes through client/index.ts — this file
@@ -39,20 +38,6 @@ export async function loadBuckets(mint: PublicKey, epochIndex: number): Promise<
 /** Fees accrued for the current unsettled round = PayoutAuthority WSOL ATA balance. */
 export async function loadFeesAccrued(mint: PublicKey): Promise<bigint> { return payoutVaultBalance(conn(), mint) }
 export async function loadAllowlistMints(): Promise<PublicKey[]> { return platformAllowlistMints(conn()) }
-
-/** Best-effort token name/symbol from the Metaplex metadata account (not H2E
- *  program data). Returns null for coins without metadata (e.g. demo fixtures). */
-export async function loadTokenMeta(mint: PublicKey): Promise<{ name: string; symbol: string } | null> {
-  try {
-    const info = await conn().getAccountInfo(deriveMintMetadata(mint))
-    if (!info) return null
-    const d = info.data as Buffer
-    let o = 1 + 32 + 32 // key + update_authority + mint
-    const readStr = () => { const len = d.readUInt32LE(o); o += 4; const s = d.slice(o, o + len).toString('utf8').replace(/\0+$/, '').trim(); o += len; return s }
-    const name = readStr(); const symbol = readStr()
-    return name || symbol ? { name, symbol } : null
-  } catch { return null }
-}
 
 /** Catalog symbol for a mint, or '' if uncatalogued (callers fall back to the
  *  address). Descriptive only — never a permission signal. */

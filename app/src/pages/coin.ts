@@ -1,45 +1,76 @@
 import { PublicKey } from '@solana/web3.js'
 import { h, mount, empty, short } from '../ui'
-import { loadCoin, loadGlobal, loadCoins, loadEpochs, loadFeesAccrued, loadAllowlistMints, loadTokenMeta } from '../chain'
+import { loadCoin, loadGlobal, loadCoins, loadEpochs, loadFeesAccrued, loadAllowlistMints } from '../chain'
 import { assetLabel, assetColor, assetGlyph } from '../catalog'
-import { placeholderFill, placeholderTile } from '../placeholder'
+import { artTile, artAvatar, setArtTicker } from '../placeholder'
+import { loadCoinMeta } from '../coinmeta'
+import { loadMarket, solPriceUsd, lamportsToUsd } from '../market'
+import { cardBody, setTicker } from '../coincard'
+import { usd, sol as solFmt, age } from '../format'
 import { walletPubkey } from '../wallet'
 
 const sol = (l: bigint | number | string) => (Number(l) / 1e9).toLocaleString(undefined, { maximumFractionDigits: 4 })
-const age = (ts: number) => {
-  const s = Math.floor(Date.now() / 1000) - ts
-  if (s < 3600) return `${Math.max(1, Math.floor(s / 60))}m`
-  if (s < 86400) return `${Math.floor(s / 3600)}h`
-  return `${Math.floor(s / 86400)}d`
-}
 
 // ---------- Explore / My coins card grid ----------
-async function coinCard(c: any): Promise<HTMLElement> {
+/**
+ * A coin card. Built synchronously with the on-chain facts (payout asset, status,
+ * age) and filled in as the two slow reads land: identity (metadata account → uri
+ * → JSON) and market figures (DBC pool). Nothing renders a 0 in place of an
+ * unknown — a missing figure is "—", because a zero reads as a dead coin.
+ */
+function coinCard(c: any): HTMLElement {
   const m = new PublicKey(c.mint)
-  const meta = await loadTokenMeta(m)
-  const name = meta?.name || short(m.toBase58(), 6)
-  const ticker = meta?.symbol ? '$' + meta.symbol : short(m.toBase58(), 4)
+  const mintStr = m.toBase58()
   const status = Object.keys(c.status)[0]
-  return h('a', { class: 'coin', href: `#/coin/${m.toBase58()}` }, [
-    h('div', { class: 'thumb' }, [
-      placeholderFill(m.toBase58()),
-      h('span', { class: 'pay' }, [h('i', { style: `background:${assetColor(c.default_payout_mint)}` }), '→ ' + assetLabel(c.default_payout_mint)]),
-      h('span', { class: 'flow' }, [status]),
-    ]),
-    h('div', { class: 'cbody' }, [
-      h('div', { class: 'nm' }, [name]),
-      h('div', { class: 'tk' }, [ticker]),
-      h('div', { class: 'crow' }, [h('span', {}, ['launched ' + new Date(Number(c.launch_ts) * 1000).toISOString().slice(0, 10)]), h('span', {}, [age(Number(c.launch_ts))])]),
-    ]),
+
+  const artWrap = h('div', { class: 'thumb' }, [
+    artTile(mintStr, null),
+    h('span', { class: 'pay' }, [h('i', { style: `background:${assetColor(c.default_payout_mint)}` }), '→ ' + assetLabel(c.default_payout_mint)]),
   ])
+  // "…" while a read is in flight; "—" only once it has actually come back empty
+  const b = cardBody({
+    name: short(mintStr, 6), symbol: null,
+    mc: '… MC', vol: '… vol', paid: '…',
+    status, age: age(Number(c.launch_ts)), loading: true,
+  })
+  const { nameEl, tickerEl, mcEl, volEl, paidEl } = b
+
+  const card = h('a', { class: 'coin', href: `#/coin/${mintStr}` }, [artWrap, b.el])
+
+  // identity — name, ticker, image
+  loadCoinMeta(m).then((meta) => {
+    if (meta.name) nameEl.textContent = meta.name
+    setTicker(tickerEl, meta.symbol)
+    setArtTicker(artWrap.querySelector('.art'), mintStr, meta.symbol)
+    if (meta.image) {
+      const img = h('img', { src: meta.image, alt: '', loading: 'lazy' })
+      img.addEventListener('error', () => img.remove())
+      artWrap.prepend(img)
+    }
+  })
+
+  // market — MC and volume from the DBC pool, paid-out from CoinConfig
+  ;(async () => {
+    const solUsd = await solPriceUsd()
+    const paid = lamportsToUsd(c.total_paid_out, solUsd)
+    paidEl.textContent = (paid == null ? solFmt(Number(c.total_paid_out) / 1e9) : usd(paid)) + ' to holders'
+    paidEl.classList.remove('loading')
+    if (!c.dbc_pool) { mcEl.textContent = '— MC'; volEl.textContent = '— vol'; mcEl.classList.remove('loading'); volEl.classList.remove('loading'); return }
+    const mk = await loadMarket(m, new PublicKey(c.dbc_pool))
+    mcEl.textContent = (mk.mcapUsd != null ? usd(mk.mcapUsd) : mk.mcapSol != null ? solFmt(mk.mcapSol) : '—') + ' MC'
+    volEl.textContent = (mk.vol24hUsd != null ? usd(mk.vol24hUsd) : '—') + ' vol'
+    if (mk.vol24hUsd == null) volEl.title = '24h volume needs the indexer — the DBC pool account carries no volume field'
+    mcEl.classList.remove('loading'); volEl.classList.remove('loading')
+  })()
+
+  return card
 }
 
 async function renderCardGrid(root: HTMLElement, coins: any[], emptyNode: HTMLElement) {
   if (coins.length === 0) { root.append(emptyNode); return }
   const grid = h('div', { class: 'cards' }, [])
   root.append(grid)
-  const cards = await Promise.all(coins.sort((a, b) => Number(b.launch_ts) - Number(a.launch_ts)).map(coinCard))
-  grid.replaceChildren(...cards)
+  grid.replaceChildren(...coins.sort((a, b) => Number(b.launch_ts) - Number(a.launch_ts)).map(coinCard))
 }
 
 export async function renderCoin(root: HTMLElement, mintStr?: string) {
@@ -60,9 +91,9 @@ export async function renderCoin(root: HTMLElement, mintStr?: string) {
   const cc = await loadCoin(mint)
   if (!cc) { mount(root, empty('No H2E coin found at this mint.', 'Either it was not launched through H2E, or you are on the wrong RPC.')); return }
 
-  const meta = await loadTokenMeta(mint)
-  const name = meta?.name || short(mint.toBase58(), 6)
-  const ticker = meta?.symbol ? '$' + meta.symbol : short(mint.toBase58(), 6)
+  const meta = await loadCoinMeta(mint)
+  const name = meta.name || short(mint.toBase58(), 6)
+  const ticker = meta.symbol ? '$' + meta.symbol.replace(/^\$/, '') : null
   const status = Object.keys(cc.status)[0]
   const payout = new PublicKey(cc.default_payout_mint)
 
@@ -79,8 +110,10 @@ export async function renderCoin(root: HTMLElement, mintStr?: string) {
 
   mount(root,
     h('div', { class: 'coinhead' }, [
-      h('div', { class: 'coinart' }, [placeholderTile(mint.toBase58())]),
-      h('div', {}, [h('h1', {}, [name]), h('p', { class: 'sub mono' }, [ticker + ' · holders paid in ', h('span', { style: 'color:var(--mint)' }, [assetLabel(payout)]), ' · ' + status])]),
+      h('div', { class: 'coinart' }, [artAvatar(mint.toBase58(), meta.symbol)]),
+      h('div', {}, [h('h1', {}, [name]), h('p', { class: 'sub mono' }, [
+        ticker ? ticker + ' · holders paid in ' : 'holders paid in ',
+        h('span', { style: 'color:var(--mint)' }, [assetLabel(payout)]), ' · ' + status])]),
     ]),
     h('div', { class: 'stats' }, [
       statCard('Accrued this round', sol(fees), true, 'SOL · 60% share'),

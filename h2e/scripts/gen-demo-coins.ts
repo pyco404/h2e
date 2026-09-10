@@ -7,6 +7,7 @@
  */
 import { PublicKey, Keypair } from '@solana/web3.js'
 import { PROGRAM_ID, encodeCoinConfig, BN } from '../client'
+import { deriveMintMetadata } from '@meteora-ag/dynamic-bonding-curve-sdk'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -14,6 +15,26 @@ const creator = new PublicKey(process.argv[2] || '111111111111111111111111111111
 const USDC = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 const NVDA = new PublicKey('Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh')
 const WSOL = new PublicKey('So11111111111111111111111111111111111111112')
+
+const METAPLEX = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
+
+/** Minimal Metaplex MetadataV1: key + update_authority + mint + name/symbol/uri
+ *  borsh strings. That prefix is all any reader needs for name/symbol/uri, and it
+ *  is what makes the app's Explore cards show a real name and ticker offline. */
+function metadataAccount(mint: PublicKey, name: string, symbol: string, uri: string) {
+  const str = (v: string) => { const b = Buffer.from(v, 'utf8'); const len = Buffer.alloc(4); len.writeUInt32LE(b.length); return Buffer.concat([len, b]) }
+  const data = Buffer.concat([
+    Buffer.from([4]), METAPLEX.toBuffer(), mint.toBuffer(),
+    str(name), str(symbol), str(uri),
+    Buffer.alloc(2),      // seller_fee_basis_points
+    Buffer.from([0]),     // creators: Option::None
+    Buffer.alloc(64),     // trailing optionals, all None/zero
+  ])
+  return {
+    pubkey: deriveMintMetadata(mint).toBase58(),
+    account: { lamports: 5_616_720, data: [data.toString('base64'), 'base64'], owner: METAPLEX.toBase58(), executable: false, rentEpoch: 0 },
+  }
+}
 
 const dir = 'scripts/.demo-coins'
 fs.rmSync(dir, { recursive: true, force: true })
@@ -39,7 +60,9 @@ async function main() {
     const data = Buffer.concat([enc, Buffer.alloc(Math.max(0, 8 + 224 - enc.length))])
     const acct = { pubkey: pda.toBase58(), account: { lamports: 5_000_000, data: [data.toString('base64'), 'base64'], owner: PROGRAM_ID.toBase58(), executable: false, rentEpoch: 0 } }
     fs.writeFileSync(path.join(dir, `${c.symbol}.acct.json`), JSON.stringify(acct))
-    console.log(`${c.symbol.padEnd(7)} mint ${mint.publicKey.toBase58()}  coinConfig ${pda.toBase58()}`)
+    const md = metadataAccount(mint.publicKey, c.name, c.symbol, '')
+    fs.writeFileSync(path.join(dir, `${c.symbol}.meta.acct.json`), JSON.stringify(md))
+    console.log(`${c.symbol.padEnd(7)} mint ${mint.publicKey.toBase58()}  coinConfig ${pda.toBase58()}  metadata ${md.pubkey}`)
   }
 }
 main()

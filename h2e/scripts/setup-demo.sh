@@ -5,7 +5,7 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."   # -> h2e/
 RPC="http://127.0.0.1:8899"
-LOG=/tmp/claude-1000/-home-pikoo-Desktop-H2E/6978b2b6-8014-4c44-84a7-f89fb4a25c87/scratchpad/validator-demo.log
+LOG="$(cd .. && pwd)/validator-demo.log"   # repo root; *.log is gitignored
 WALLET_PK="$(solana-keygen pubkey "$HOME/.config/solana/id.json")"
 
 pkill -9 -f solana-test-validator 2>/dev/null || true

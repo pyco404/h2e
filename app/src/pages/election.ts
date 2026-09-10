@@ -1,6 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import { h, mount, empty, short } from '../ui'
-import { loadCoin, loadAllowlistMints, loadTokenMeta } from '../chain'
+import { loadCoin, loadAllowlistMints } from '../chain'
+import { loadCoinMeta } from '../coinmeta'
 import { walletPubkey, signMessage } from '../wallet'
 import { assetLabel, assetColor, assetGlyph, marketHoursWarning } from '../catalog'
 import { assetPicker } from '../asset-picker'
@@ -21,8 +22,8 @@ export async function renderElection(root: HTMLElement, mintStr?: string) {
   const allow = await loadAllowlistMints()
   if (!allow.length) { mount(root, empty('No payout assets to choose from yet.', 'PlatformAllowlist is not initialized on this RPC.')); return }
 
-  const meta = await loadTokenMeta(mint)
-  const ticker = meta?.symbol ? '$' + meta.symbol : short(mint.toBase58(), 6)
+  const meta = await loadCoinMeta(mint)
+  const ticker = meta.symbol ? '$' + meta.symbol.replace(/^\$/, '') : short(mint.toBase58(), 6)
   const def = new PublicKey(cc.default_payout_mint)
   const epoch = Number(cc.current_epoch)
   let picked = def.toBase58()

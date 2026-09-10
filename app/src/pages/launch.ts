@@ -1,9 +1,10 @@
 import { PublicKey } from '@solana/web3.js'
 import { h, mount, empty } from '../ui'
 import { loadGlobal, loadAllowlistMints } from '../chain'
-import { assetInfo, assetGlyph, assetColor, assetLabel } from '../catalog'
+import { assetInfo, assetColor, assetLabel } from '../catalog'
 import { assetPicker } from '../asset-picker'
-import { placeholderFill } from '../placeholder'
+import { artTile } from '../placeholder'
+import { cardBody } from '../coincard'
 import { walletPubkey } from '../wallet'
 import { submitLaunch, LaunchForm } from '../launchtx'
 
@@ -13,7 +14,7 @@ function metadataApi(): string | null {
   try { return localStorage.getItem('h2e.metadataApi') } catch { return null }
 }
 
-interface St { name: string; symbol: string; uri: string; imageFile: File | null; payout: string }
+interface St { name: string; symbol: string; imageFile: File | null; payout: string }
 
 export async function renderLaunch(root: HTMLElement) {
   const gc = await loadGlobal()
@@ -22,7 +23,7 @@ export async function renderLaunch(root: HTMLElement) {
   if (!allow || allow.length === 0) { mount(root, empty('The payout-asset picker needs the platform allowlist.', 'PlatformAllowlist is empty. An admin adds payout mints via set_platform_allowlist, then reload.')); return }
 
   const usdc = gc.usdc_mint ? new PublicKey(gc.usdc_mint).toBase58() : allow[0].toBase58()
-  const st: St = { name: '', symbol: '', uri: '', imageFile: null, payout: allow.find((m) => m.toBase58() === usdc)?.toBase58() || allow[0].toBase58() }
+  const st: St = { name: '', symbol: '', imageFile: null, payout: allow.find((m) => m.toBase58() === usdc)?.toBase58() || allow[0].toBase58() }
   let screen: 'form' | 'launch' = 'form'
   const hasMeta = !!metadataApi()
 
@@ -85,14 +86,23 @@ export async function renderLaunch(root: HTMLElement) {
     const side = document.getElementById('launch-side'); if (!side) return
     const info = assetInfo(st.payout)
     const img = st.imageFile ? h('img', { src: URL.createObjectURL(st.imageFile), alt: '' }) : null
+    // The real Explore card, from the same renderer (coincard.ts) — so this preview
+    // cannot drift from it. A coin that does not exist yet has no market: "—", not
+    // a fabricated $0.00, which would read as a dead coin the moment it launched.
     const pcard = h('div', { class: 'pcard' }, [
-      h('div', { class: 'pimg' }, [img || placeholderFill(st.symbol || st.name || st.payout), h('span', { class: 'ptag' }, [h('i', { style: `background:${assetColor(st.payout)}` }), assetLabel(st.payout)])]),
-      h('div', { class: 'pbody' }, [
-        h('div', { class: 'nm' }, [st.name || 'Your coin']),
-        h('div', { class: 'tk' }, ['$' + (st.symbol || 'TICKER')]),
-        h('div', { class: 'prow' }, [h('span', {}, ['$0.00 ', h('span', { style: 'color:var(--faint)' }, ['MC'])]), h('span', {}, ['$0 vol'])]),
-        h('div', { class: 'prow' }, [h('span', {}, ['—']), h('span', {}, ['new'])]),
+      h('div', { class: 'pimg' }, [
+        // Art is seeded by the MINT, which does not exist until launch — so this
+        // tile is representative, not the final image. The caption below says so.
+        img || artTile(st.symbol || st.name || 'preview', st.symbol || st.name || ' '),
+        h('span', { class: 'ptag' }, [h('i', { style: `background:${assetColor(st.payout)}` }), '→ ' + assetLabel(st.payout)]),
       ]),
+      cardBody({
+        name: st.name || 'Your coin',
+        symbol: st.symbol || 'TICKER',
+        mc: '— MC', vol: '— vol',
+        paid: '$0 to holders',
+        status: 'Bonding', age: 'new',
+      }).el,
     ])
     const spec = h('dl', { class: 'spec' }, [
       specRow('Network', 'Solana'),
@@ -107,7 +117,7 @@ export async function renderLaunch(root: HTMLElement) {
     side.replaceChildren(
       h('p', { class: 'plabel' }, [h('i', { class: 'dot' }), 'Live preview', h('span', {}, ['how it shows on Explore'])]),
       pcard, spec, cont,
-      h('p', { class: 'fine' }, ['Payout asset and fee routing are permanent.']),
+      h('p', { class: 'fine' }, ['Payout asset and fee routing are permanent. Without an image, card art is generated from the mint address at launch.']),
     )
   }
 
