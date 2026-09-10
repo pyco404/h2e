@@ -1,0 +1,15 @@
+[workspace]
+members = ["programs/*"]
+resolver = "2"
+
+# Size-oriented release profile, configured from the start (spec: report size;
+# a small program should be tens of KB). opt-level "z" + fat LTO + one codegen
+# unit + strip minimise the .so; overflow-checks stay on for safety.
+[profile.release]
+overflow-checks = true
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+incremental = false

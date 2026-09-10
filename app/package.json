@@ -1,0 +1,11 @@
+{
+  "name": "h2e-app",
+  "private": true,
+  "type": "module",
+  "description": "H2E launch console — framework-free TS scaffold bundled with esbuild.",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --serve",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

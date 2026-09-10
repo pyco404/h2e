@@ -1,0 +1,54 @@
+{
+  "recipients": [
+    "Mcg4gdiDdb12Q9UHJ3sSSGGipg8RYg8NDBivdPv55Zs",
+    "Qh83dyJsUa32NTrPC5YCyvMkfXw1SztChCxx6Hj7BYY",
+    "nPi4vZj8XKL36woCKxUoandWeUr5mq58PuNzTNSxHCJ",
+    "v6NTfWS1vyd534sfxWuNAKqUVsuRATeubwVRjZUGzjd",
+    "2z97Vd7ZqtUqebXFbHGfvjLneLxGfJz6io1AuZUZrfxk",
+    "4tx8bz7YrSgQvXPjkHdDEMMQTBfzwrSNWvJ6r1MCAEf5",
+    "69sUnmbVWaWaWdkVy2N8hzKPV9Rt6q8d9Xuf51mp59pc",
+    "6gccBNGoTR9rVyq5oN22dRsrH76rgaWpJu6Xnrs7YZjt",
+    "7R1mYLMYacJXPZgmbfzteLNa4jP4WG1yenxuVfyRV1BT",
+    "7m9bwxNdJqcf8iWvmQoTjnRoiVroYf5EfAmPbG5mRar4",
+    "91DrgkqhyWRT8USHoVGsNYVbw2x9ghdWqLDRCHyxEThn",
+    "9Uz68pk4mbPF4YLdbyH5kujULxJWEp6CsoNCKnFvpYGm",
+    "9jLzuz3UygUK2YLQgSBoXHBhxBaALPZGVu4i9SF8Ya2o",
+    "BLPLKajhFEqyC7bnAQvuoDf6GsJ3LxMFkFx2nHoDiNqf",
+    "BWvngpw64KFPychi9NYHYvqHrBQYerSqKKUyVRc6Pobs",
+    "CuacApDriEwbR46VfgQePpYqRGMe5jtv4x9dcxJV4pNg",
+    "DRu7ga1cW9iEgL1dGYPvGk9bJdLQTE3NUGdpqbRVAxKJ",
+    "Dk4o7MH3BTgrKh5sSiJZYWvYXsXuuGCd1JcE9Pfmi8ST",
+    "FHP3km9ugRYLPN2uW8ncdA4h1eQmhB68DFQ6t58ikqtd",
+    "Fi8BmmQ1V7Z19N4PynSAnzKawLmKFbJL6x1vGRrPd1gW"
+  ],
+  "cases": {
+    "A": {
+      "mint": "7Biut5t81ZHfpqHNNZmYWNLYCqLNq3K6RpLEWbe76gVm",
+      "epoch": "ATqEpo4VaESwv3XcppCCMokWYvaHJGDSH47LhCAoPcEC",
+      "bucket": "HXu1DJu4V1DrRZ8gdcftMYzovKwf4fWhoSZZgJFK1U4M",
+      "amountOut": 20000000,
+      "recipientCount": 20
+    },
+    "B": {
+      "mint": "2EitruKxs7Km5XLyY4AsLARkLmQGYgq8UeePrjxwYxkg",
+      "epoch": "3p8KTAMbHK71vSvnxBHkGdi7zoW7AmBUnwGTaVUMFXmP",
+      "bucket": "D3WMQ85QWpAKp1rCAFFYJWSF1FGHEtA4kuF2VpTwQGrq",
+      "amountOut": 20000000,
+      "recipientCount": 20
+    },
+    "C": {
+      "mint": "7WWnWAmxmvhDZvYTYRvCDCx4PpAZETUQQxfiiayXpFXB",
+      "epoch": "D11GRTdwpjoSFWGiuWwEnS7tkqL5QpXczzgeM3FuowBY",
+      "bucket": "2PVMy351JjxWjPjFdfLGT2DzC79H1iS9AhdamTdUzeFg",
+      "amountOut": 20000000,
+      "recipientCount": 20
+    },
+    "D": {
+      "mint": "5ggugCaEDDXHHJ2G2Nh8LDmoQnT9wESfXPncenuQDarP",
+      "epoch": "797RQQ44B564vLpuritMqdoFwFJyYLscu8eRNqMBLNR8",
+      "bucket": "8wcuCPZDUkGdYSRzy2HfPei9XWq2fqMi6PuaWjavQCV9",
+      "amountOut": 1000,
+      "recipientCount": 20
+    }
+  }
+}

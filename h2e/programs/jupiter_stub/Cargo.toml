@@ -1,0 +1,21 @@
+[package]
+name = "jupiter_stub"
+version = "0.1.0"
+edition = "2021"
+description = "Local fixed-rate swap stub standing in for the Jupiter aggregator in swap_payout tests"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "jupiter_stub"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = "0.32.1"
+anchor-spl = "0.32.1"

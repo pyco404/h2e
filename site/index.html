@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H2E — Hold to Earn</title>
+<meta name="description" content="A Solana launchpad where a coin's trading fees are paid to the people holding it, every day, in an asset each holder picks.">
+<meta property="og:title" content="H2E — Hold to Earn">
+<meta property="og:description" content="Launch a coin that pays its holders. Every 24 hours, in an asset they choose.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://h2etoken.xyz">
+<meta property="og:site_name" content="H2E">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@h2e_pf">
+<link rel="canonical" href="https://h2etoken.xyz">
+<link rel="icon" href="h2e-logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E0D0C; --card:#171614; --card-2:#1D1B19;
+    --line:#2A2724; --line-2:#3A3632;
+    --text:#E8E3DA; --dim:#8E877D; --faint:#655F58;
+    --mint:#A8E6B0; --mint-dim:#5E8A66;
+    --measure:34rem;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-weight:700;letter-spacing:-.02em}
+  .mono,.fig{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  a{color:var(--mint)}
+  :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+  .wrap{max-width:63rem;margin:0 auto;padding:0 1.5rem}
+
+  /* masthead */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0}
+  .mark{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;font-size:1.15rem}
+  .mark .wordmark b{color:var(--mint);font-weight:800}
+  .logomark{width:26px;height:26px;display:block;flex:none}
+  .topnav{display:flex;gap:1.5rem;align-items:center}
+  .nav{font-size:.9rem;font-weight:500;color:var(--dim);text-decoration:none}
+  .nav:hover{color:var(--text)}
+
+  /* hero */
+  .hero{padding:5rem 0 4rem;border-bottom:1px solid var(--line)}
+  h1{margin:0;font-weight:800;font-size:clamp(2.4rem,7vw,4.6rem);line-height:1;letter-spacing:-.035em;max-width:15ch}
+  .lede{max-width:var(--measure);margin:1.6rem 0 0;font-size:1.15rem;color:var(--dim);line-height:1.55}
+
+  .machine{margin:2.75rem 0 0;padding:1.6rem 1.6rem 1.35rem;background:var(--card);border:1px solid var(--line);border-radius:14px;max-width:41rem}
+  .machine p{margin:0;font-size:1.25rem;line-height:1.9}
+  .picker{font-family:Archivo;font-weight:600;font-size:1rem;color:var(--mint);background:var(--card-2);
+    border:1px solid var(--mint-dim);border-radius:8px;padding:.2rem 2rem .2rem .55rem;appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='11' height='7'><path d='M1 1l4.5 4.5L10 1' stroke='%23A8E6B0' stroke-width='1.6' fill='none'/></svg>");
+    background-repeat:no-repeat;background-position:right .6rem center}
+  .readout{display:flex;flex-wrap:wrap;gap:.5rem 1.75rem;align-items:baseline;margin:1.4rem 0 0;padding:1.1rem 0 0;border-top:1px solid var(--line)}
+  .readout div{display:flex;gap:.55rem;align-items:baseline}
+  .readout dt{font-size:.78rem;font-weight:500;color:var(--faint);margin:0}
+  .readout dd{margin:0;font-weight:600;font-size:1rem;font-family:"IBM Plex Mono",monospace}
+  .amt{color:var(--mint)}
+
+  .cta-row{display:flex;flex-wrap:wrap;gap:.75rem;margin:2.25rem 0 0;align-items:center}
+  .btn{display:inline-block;font-weight:600;font-size:.95rem;text-decoration:none;padding:.7rem 1.3rem;border-radius:9px;
+    background:var(--mint);color:#0E0D0C;border:1px solid var(--mint)}
+  .btn:hover{background:#BCEEC3}
+  .btn-quiet{background:var(--card);color:var(--text);border:1px solid var(--line)}
+  .btn-quiet:hover{border-color:var(--line-2)}
+  .status{font-size:.9rem;color:var(--dim)}
+
+  /* sections */
+  section{padding:4rem 0;border-bottom:1px solid var(--line)}
+  h2{margin:0 0 2rem;font-weight:700;font-size:1.7rem;letter-spacing:-.025em}
+  .prose{max-width:var(--measure)}
+  .prose p{margin:0 0 1.1rem;color:var(--dim)}
+
+  ol.steps{list-style:none;margin:0;padding:0;counter-reset:s;max-width:44rem}
+  ol.steps li{counter-increment:s;display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;padding:1.4rem 0;border-top:1px solid var(--line)}
+  ol.steps li:first-child{border-top:none;padding-top:0}
+  ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:1.15rem;color:var(--mint);line-height:1.2}
+  ol.steps h3{margin:0 0 .3rem;font-size:1.05rem;font-weight:600}
+  ol.steps p{margin:0;color:var(--dim)}
+
+  .split{max-width:44rem}
+  .bar{display:flex;height:3rem;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:0 0 1rem}
+  .bar span{display:block}
+  .b1{width:60%;background:var(--mint)}
+  .b2{width:30%;background:var(--mint-dim)}
+  .b3{width:10%;background:var(--line-2)}
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1.25rem}
+  .legend div{border-top:2px solid var(--line-2);padding:.65rem 0 0}
+  .legend .pct{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:1.4rem;display:block;line-height:1;color:var(--text)}
+  .legend p{margin:.35rem 0 0;font-size:.92rem;color:var(--dim)}
+  .note{max-width:var(--measure);margin:2rem 0 0;font-size:1.02rem;color:var(--dim)}
+
+  dl.rules{margin:0;max-width:44rem}
+  dl.rules > div{padding:1.25rem 0;border-top:1px solid var(--line)}
+  dl.rules > div:first-child{border-top:none;padding-top:0}
+  dl.rules dt{font-weight:600;font-size:1.05rem;margin:0 0 .3rem}
+  dl.rules dd{margin:0;color:var(--dim)}
+
+  .token{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:2.5rem;margin:4rem 0;border-bottom:1px solid var(--line)}
+  .token .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;letter-spacing:.06em;
+    color:var(--mint);background:rgba(168,230,176,.08);border:1px solid var(--mint-dim);padding:.28rem .6rem;border-radius:999px;margin:0 0 1.25rem}
+  .token h2{margin:0 0 1.25rem}
+  .token .prose p{color:var(--dim)}
+
+  footer{padding:2.5rem 0 4rem;font-size:.9rem;color:var(--faint)}
+  footer a{color:var(--dim)}
+
+  @media (max-width:640px){.hero{padding:3.25rem 0 2.75rem}.machine{padding:1.3rem}.machine p{font-size:1.08rem;line-height:2.1}section{padding:3rem 0}.token{padding:1.6rem}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mark"><img class="logomark" src="h2e-logo.png" alt=""><span class="wordmark">h<b>2</b>e</span></div>
+    <nav class="topnav">
+      <a class="nav" href="#how">How it works</a>
+      <!-- The launch console. In production point this at the app URL, e.g. https://app.h2etoken.xyz -->
+      <a class="nav" href="http://localhost:5178/#/coin">Launch</a>
+    </nav>
+  </header>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Hold the coin. Get paid in whatever you want.</h1>
+    <p class="lede">H2E is a Solana launchpad where a coin's trading fees go to the people holding it — paid out every 24 hours, in an asset each holder picks.</p>
+
+    <div class="machine">
+      <p>
+        You hold a coin.<br>
+        Pay me in
+        <label for="asset" style="position:absolute;left:-9999px">Payout asset</label>
+        <select id="asset" class="picker">
+          <option value="USDC" data-unit="USDC">USDC</option>
+          <option value="SOL" data-unit="SOL">SOL</option>
+          <option value="TSLAx" data-unit="TSLAx">tokenized Tesla</option>
+          <option value="NVDAx" data-unit="NVDAx">tokenized Nvidia</option>
+          <option value="JitoSOL" data-unit="jitoSOL">jitoSOL</option>
+        </select>.
+      </p>
+      <dl class="readout">
+        <div><dt>Arrives</dt><dd>every 24h</dd></div>
+        <div><dt>In your wallet as</dt><dd class="amt fig" id="unit">USDC</dd></div>
+        <div><dt>You claim</dt><dd>nothing — it's sent</dd></div>
+      </dl>
+    </div>
+
+    <div class="cta-row">
+      <!-- The launch console. In production point this at the app URL, e.g. https://app.h2etoken.xyz -->
+      <a class="btn" href="http://localhost:5178/#/coin">Launch a coin</a>
+      <a class="btn btn-quiet" href="#how">See how it works</a>
+      <a class="nav" href="https://x.com/h2e_pf" rel="noopener" style="margin-left:.25rem">Follow X</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><div><h3>Someone launches a coin</h3><p>Through H2E, on a Meteora bonding curve. The creator takes no cut of the trading fees — not now, not ever.</p></div></li>
+      <li><div><h3>The coin trades, and fees collect</h3><p>Every buy and sell pays a fee. Instead of landing in the creator's wallet, it accumulates in a vault no person can withdraw from.</p></div></li>
+      <li><div><h3>Every 24 hours, it's paid out</h3><p>Each holder picks what they want to receive. The vault is swapped into those assets and sent directly to wallets. Nothing to claim.</p></div></li>
+    </ol>
+  </section>
+</div>
+
+<div class="wrap">
+  <section>
+    <h2>Where the fees go</h2>
+    <div class="split">
+      <div class="bar" role="img" aria-label="Fee split: 60 percent to coin holders, 30 percent to H2E holders, 10 percent to the platform">
+        <span class="b1"></span><span class="b2"></span><span class="b3"></span>
+      </div>
+      <div class="legend">
+        <div><span class="pct fig">60%</span><p>To the people holding that coin</p></div>
+        <div><span class="pct fig">30%</span><p>To $H2E holders, from every coin on the platform</p></div>
+        <div><span class="pct fig">10%</span><p>To run the platform</p></div>
+      </div>
+      <p class="note">Ninety percent of every fee reaches a holder. Hold a coin and $H2E and you're in both streams.</p>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section>
+    <h2>The rules</h2>
+    <dl class="rules">
+      <div><dt>Hold for 24 hours to be paid</dt><dd>Your share is based on the smallest balance you held across the day, so buying just before a payout doesn't work and selling forfeits it.</dd></div>
+      <div><dt>Creators earn nothing from launching</dt><dd>No fee share. A creator can buy their own coin and earn as a holder like anyone else — that's the only way they make anything.</dd></div>
+      <div><dt>Dev buys through H2E are capped at 3%</dt><dd>Enforced on-chain at launch, and optional — a creator can start with nothing at all.</dd></div>
+      <div><dt>Wallets above 3% of supply are skipped</dt><dd>Payouts go to the many, not to whoever bought the most.</dd></div>
+      <div><dt>Nobody can touch the vaults</dt><dd>Fees are held by the program itself. There is no wallet, no key, and no admin able to withdraw what's owed to holders.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<div class="wrap">
+  <div class="token">
+    <span class="tag">Not launched yet</span>
+    <h2>$H2E</h2>
+    <div class="prose">
+      <p>Thirty percent of the fees from every coin on the platform goes to people holding $H2E. It's a claim on what the platform actually earns, not a promise about a price.</p>
+      <p>The token doesn't exist yet. That 30% is accruing in a vault from the first coin launched, and will be distributed to $H2E holders once it does.</p>
+      <p>We're not going to quote you a yield. What holders earn depends entirely on how much trading happens here, and anyone who tells you a number before that exists is guessing.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>H2E is in development.</footer>
+</div>
+
+<script>
+  const sel = document.getElementById('asset');
+  const unit = document.getElementById('unit');
+  sel.addEventListener('change', () => { unit.textContent = sel.selectedOptions[0].dataset.unit; });
+</script>
+</body>
+</html>

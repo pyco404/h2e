@@ -1,0 +1,24 @@
+[package]
+name = "h2e"
+version = "0.1.0"
+edition = "2021"
+description = "H2E launchpad program"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "h2e"
+
+[features]
+default = []
+# Repoints JUPITER_PROGRAM at the local stub aggregator so the swap_payout tests
+# run without the real Jupiter deployment. Flip off to pin the mainnet venue.
+stub-jupiter = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = "0.32.1"
+anchor-spl = "0.32.1"

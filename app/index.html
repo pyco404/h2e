@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H2E — console</title>
+<meta name="description" content="Launch a coin that pays its holders, and inspect coins, elections and rounds.">
+<link rel="icon" type="image/png" href="public/h2e-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <a class="brand" href="#/"><img class="glyph-logo" src="public/h2e-logo.png" alt="">h2e</a>
+    <nav id="nav">
+      <a data-route="#/coin">Explore</a>
+      <a data-route="#/launch">Launch</a>
+      <a data-route="#/mine">Portfolio</a>
+      <a data-route="#/round">Rounds</a>
+    </nav>
+    <div class="bar-end" id="wallet-slot"></div>
+  </div>
+  <main id="app"></main>
+</div>
+<script src="dist/bundle.js"></script>
+</body>
+</html>
